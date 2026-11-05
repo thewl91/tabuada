@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tabuada Divertida</title>
+<style>
+:root{--bg:#e3f2fd;--card:#fff;--ink:#0d2a52;--pri:#1e88e5;--ok:#2ecc71;--bad:#ff5252;--acc:#ffb300;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d2240;--card:#16356b;--ink:#e3f2fd}}
+:root[data-theme="dark"]{--bg:#0d2240;--card:#16356b;--ink:#e3f2fd}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:"Trebuchet MS","Comic Sans MS",system-ui,sans-serif}
+.app{max-width:480px;margin:0 auto;padding:14px}
+h1{text-align:center;margin:6px 0;font-size:30px}
+.card{background:var(--card);border-radius:24px;padding:16px;margin:12px 0;box-shadow:0 6px 0 rgba(30,136,229,.25)}
+h3{margin:0 0 10px}
+.chips{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.chip,.opt{border:3px solid var(--pri);background:transparent;color:var(--ink);border-radius:16px;font:inherit;font-weight:700;font-size:20px;padding:10px 0;cursor:pointer;transition:transform .15s}
+.chip.on,.opt.on{background:var(--pri);color:#fff;transform:scale(1.08)}
+.wide{grid-column:1/-1;font-size:17px}
+.row{display:flex;gap:8px}.row .opt{flex:1;font-size:16px;padding:10px 4px}
+.big{width:100%;border:0;border-radius:20px;background:var(--ok);color:#fff;font:inherit;font-weight:800;font-size:24px;padding:16px;cursor:pointer;box-shadow:0 6px 0 #1e9e50;margin-top:6px}
+.big:active{transform:translateY(4px);box-shadow:0 2px 0 #1e9e50}
+.big.alt{background:var(--pri);box-shadow:0 6px 0 #1565c0}
+.hide{display:none}#secs .opt{flex:1 0 28%}
+.mascot{font-size:64px;text-align:center;animation:float 2s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-10px) rotate(6deg)}}
+.hud{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:20px}
+.time{background:var(--acc);color:#2b2350;border-radius:14px;padding:6px 14px;font-size:26px}
+.time.low{background:var(--bad);color:#fff;animation:pulse .5s infinite alternate}
+@keyframes pulse{to{transform:scale(1.12)}}
+.bar{height:12px;border-radius:8px;background:rgba(30,136,229,.2);overflow:hidden;margin:10px 0}
+.bar i{display:block;height:100%;width:0;background:var(--pri);transition:width .3s}
+.q{text-align:center;font-size:56px;font-weight:900;margin:8px 0;animation:pop .35s}
+@keyframes pop{from{transform:scale(.5);opacity:0}}
+.ans{text-align:center;font-size:48px;font-weight:900;min-height:64px;border-bottom:5px dashed var(--pri);margin:0 20%}
+.shake{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-14px)}75%{transform:translateX(14px)}}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.pad button{border:0;border-radius:16px;background:var(--pri);color:#fff;font:inherit;font-weight:800;font-size:28px;padding:14px 0;cursor:pointer;box-shadow:0 4px 0 #1565c0}
+.pad button:active{transform:translateY(3px);box-shadow:0 1px 0 #1565c0}
+.pad .go{background:var(--ok);box-shadow:0 4px 0 #1e9e50}.pad .del{background:var(--bad);box-shadow:0 4px 0 #c33}
+.msg{text-align:center;font-weight:800;min-height:28px;font-size:20px}
+.table{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;font-size:18px;font-weight:700}
+.table div{background:rgba(30,136,229,.12);border-radius:10px;padding:6px;text-align:center}
+.stars{font-size:48px;text-align:center}.stars span{display:inline-block;animation:pop .5s backwards}
+.score{text-align:center;font-size:22px;font-weight:700;line-height:1.6}
+.miss{font-size:18px;font-weight:700}.miss div{padding:4px 0}
+.fx{position:fixed;pointer-events:none;font-size:28px;z-index:9;animation:fly 1.2s ease-out forwards}
+@keyframes fly{to{transform:translate(var(--x),var(--y)) rotate(360deg);opacity:0}}
+</style></head><body><div class="app">
+<h1>✖️ Tabuada Divertida 🎉</h1>
+
+<div id="menu">
+ <div class="mascot">🤖</div>
+ <div class="card"><h3>1️⃣ Qual tabuada?</h3><div class="chips" id="chips"></div></div>
+ <div class="card"><h3>2️⃣ Tempo</h3>
+  <div class="row"><button class="opt on" data-m="crono">⏱️ Cronômetro</button><button class="opt" data-m="timer">⏳ Temporizador</button></div>
+  <div id="secs" class="row hide" style="margin-top:8px;flex-wrap:wrap"><button class="opt" data-s="2">2s</button><button class="opt" data-s="3">3s</button><button class="opt on" data-s="5">5s</button><button class="opt" data-s="8">8s</button><button class="opt" data-s="10">10s</button><button class="opt" data-s="15">15s</button></div>
+  <p id="hint" style="margin:8px 0 0;font-weight:600">Cronômetro: passa a tabuada inteira e mede o tempo.</p></div>
+ <button class="big" id="play">🚀 Jogar!</button>
+ <button class="big alt" id="study">📖 Ver a tabuada</button>
+ <div id="tbl" class="card hide"></div>
+</div>
+
+<div id="game" class="hide">
+ <div class="card">
+  <div class="hud"><button class="opt" id="back" style="padding:6px 12px;font-size:16px">🏠 Menu</button><span class="time" id="clock">0:00</span><span id="cnt">1</span></div>
+  <div class="bar"><i id="prog"></i></div>
+  <div class="mascot" id="mas" style="font-size:48px">🤖</div>
+  <div class="msg" id="tt"></div>
+  <div class="q" id="q"></div><div class="q" id="ans" style="color:var(--pri);min-height:70px"></div>
+  <button class="big alt" id="nx">➡️ Próxima</button>
+ </div>
+</div>
+
+<div id="end" class="hide"><div class="card">
+ <div class="mascot" id="emo">🏆</div><div class="stars" id="stars"></div>
+ <div class="score" id="sc"></div><div class="miss" id="miss"></div></div>
+ <button class="big" id="again">🔁 Jogar de novo</button>
+ <button class="big alt" id="home">🏠 Menu</button>
+</div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+let sel=new Set([2]),mode="crono",secs=5,all=false;
+const chips=$("chips");
+for(let i=1;i<=10;i++){const b=document.createElement("button");b.className="chip"+(i==2?" on":"");b.textContent=i;b.onclick=()=>{all=false;sel.has(i)?sel.delete(i):sel.add(i);if(!sel.size)sel.add(i);draw()};chips.appendChild(b)}
+const ab=document.createElement("button");ab.className="chip wide";ab.textContent="🎲 Todas (1 ao 10)";ab.onclick=()=>{all=!all;sel=new Set(all?[1,2,3,4,5,6,7,8,9,10]:[2]);draw()};chips.appendChild(ab);
+function draw(){[...chips.children].forEach((b,i)=>{if(i<10)b.classList.toggle("on",sel.has(i+1));else b.classList.toggle("on",all)})}
+document.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{mode=b.dataset.m;document.querySelectorAll("[data-m]").forEach(x=>x.classList.toggle("on",x==b));$("secs").classList.toggle("hide",mode!="timer");$("hint").textContent=mode=="crono"?"Cronômetro: passa a tabuada inteira e mede o tempo.":"Temporizador: tempo para pensar em cada conta, depois aparece o resultado."});
+document.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{secs=+b.dataset.s;document.querySelectorAll("[data-s]").forEach(x=>x.classList.toggle("on",x==b))});
+$("study").onclick=()=>{const t=$("tbl");t.classList.toggle("hide");let h="";[...sel].sort((a,b)=>a-b).forEach(n=>{h+=`<h3>Tabuada do ${n}</h3><div class="table">`;for(let i=1;i<=10;i++)h+=`<div>${n} × ${i} = ${n*i}</div>`;h+="</div>"});t.innerHTML=h};
+// audio
+let ac;function beep(f,d=.15,t="sine"){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.type=t;o.frequency.value=f;g.gain.value=.15;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
+function fx(list,n=14){for(let i=0;i<n;i++){const s=document.createElement("div");s.className="fx";s.textContent=list[i%list.length];s.style.left="50%";s.style.top="40%";s.style.setProperty("--x",(Math.random()*320-160)+"px");s.style.setProperty("--y",(Math.random()*-300-20)+"px");document.body.appendChild(s);setTimeout(()=>s.remove(),1300)}}
+// game
+let list=[],idx=0,t0,iv,tm1,tm2,tq=0,revealed=false;
+const shuf=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const fmt=s=>Math.floor(s/60)+":"+String(Math.floor(s%60)).padStart(2,"0");
+function show(id){["menu","game","end"].forEach(x=>$(x).classList.toggle("hide",x!=id))}
+function stop(){clearInterval(iv);clearTimeout(tm1);clearTimeout(tm2)}
+$("play").onclick=start;$("again").onclick=start;$("home").onclick=()=>show("menu");
+$("back").onclick=()=>{stop();show("menu")};
+$("nx").onclick=()=>{clearTimeout(tm1);clearTimeout(tm2);next()};
+function start(){list=[];[...sel].sort((a,b)=>a-b).forEach(n=>shuf([1,2,3,4,5,6,7,8,9,10]).forEach(b=>list.push([n,b])));idx=0;show("game");t0=Date.now();beep(660);stop();next();tick();iv=setInterval(tick,250)}
+function tick(){const el=(Date.now()-t0)/1000;if(mode=="crono"){$("clock").textContent=fmt(el);$("clock").classList.remove("low")}else{const r=Math.max(0,secs-(Date.now()-tq)/1000);$("clock").textContent=revealed?"✅":Math.ceil(r)+"s";$("clock").classList.toggle("low",!revealed&&r<=2)}}
+function next(){if(idx>=list.length){finish();return}
+const [a,b]=list[idx];idx++;$("cnt").textContent=idx+"/"+list.length;$("prog").style.width=((idx-1)/list.length*100)+"%";
+$("tt").textContent="Tabuada do "+a;$("q").style.animation="none";void $("q").offsetWidth;$("q").style.animation="";$("q").textContent=a+" × "+b+" =";$("ans").textContent="❓";$("mas").textContent="🤖";
+tq=Date.now();revealed=false;const w=mode=="crono"?1500:secs*1000;tm1=setTimeout(()=>{revealed=true;$("ans").style.animation="none";void $("ans").offsetWidth;$("ans").style.animation="pop .4s";$("ans").textContent=a*b;$("mas").textContent="🤖✨";beep(700+b*40,.2);fx(["⭐","✨","💙"],8)},w);
+tm2=setTimeout(next,w+(mode=="crono"?2300:2000))}
+function finish(){stop();if(!$("end").classList.contains("hide"))return;const el=(Date.now()-t0)/1000,done=Math.max(0,idx-(idx<list.length?1:0));
+show("end");$("emo").textContent="🏆";$("stars").innerHTML=[...Array(3)].map((_,i)=>`<span style="animation-delay:${i*.3}s">⭐</span>`).join("");
+$("sc").innerHTML=`Você viu <b>${done}</b> contas da tabuada do <b>${[...sel].sort((a,b)=>a-b).join(", ")}</b>!<br>⏱️ Tempo: <b>${fmt(el)}</b><br>Parabéns, continue treinando!`;
+$("miss").innerHTML="";beep(523,.15);setTimeout(()=>beep(659,.15),150);setTimeout(()=>beep(784,.3),300);fx(["🎉","🎊","⭐","🤖","💙"],24)}
+</script></body></html>
